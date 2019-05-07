@@ -1,13 +1,14 @@
 package example
 
-fun getGreeting(): String {
-    return "Hello, world!"
-}
-
 fun buildDiamond(letter: Char) : Array<String> {
-    return arrayOf(" ")
+    val letters = 'A'..letter
+    val size = letters.count()
+    return letters.mapIndexed { index, c ->
+        val spacesBefore = CharArray(size - index - 1) { ' ' }
+        "${spacesBefore.joinToString("")}$c"
+    }.toTypedArray()
 }
 
 fun main() {
-    println(getGreeting())
+    buildDiamond('D').forEach { println(it) }
 }
