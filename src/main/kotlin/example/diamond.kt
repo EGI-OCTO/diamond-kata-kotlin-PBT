@@ -15,9 +15,9 @@ private fun buildDiamondFrom(
             arrayOf(buildLineForLetter(letter))
         } else {
             val outerLine = buildLineForLetter(letter)
-            val interLine = buildDiamondFrom(finalLetter, buildLineForLetter)(letter.inc())
+            val innerLines = buildDiamondFrom(finalLetter, buildLineForLetter)(letter.inc())
             arrayOf(outerLine)
-                .plus(interLine)
+                .plus(innerLines)
                 .plus(outerLine)
         }
     }
