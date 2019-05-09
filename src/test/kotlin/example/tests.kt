@@ -15,7 +15,7 @@ class MyTests : StringSpec({
         forAll(LetterGenerator()) { letter: Char ->
             val diamond = buildDiamond(letter)
             val lettersInUpperLeftDiagonal = buildUpperLeftDiagonalCoordinates(letter)
-                    .map { diamond[it.second][it.first] }
+                .map { diamond[it.first][it.second] }
             lettersInUpperLeftDiagonal == (letter downTo 'A').toList()
         }
     }
@@ -23,7 +23,7 @@ class MyTests : StringSpec({
         forAll(LetterGenerator()) { letter: Char ->
             val diamond = buildDiamond(letter)
             val lettersInUpperRightDiagonal = buildUpperRightDiagonalCoordinates(letter)
-                .map { diamond[it.second][it.first] }
+                .map { diamond[it.first][it.second] }
             lettersInUpperRightDiagonal == (letter downTo 'A').toList()
         }
     }
@@ -45,16 +45,16 @@ class LetterGenerator : Gen<Char> {
 
 fun buildUpperLeftDiagonalCoordinates(letter: Char): List<Pair<Int, Int>> {
     val lastLetterIndex = ('A'..letter).count() - 1
-    val xCoordinates = 0..lastLetterIndex
     val yCoordinates = lastLetterIndex downTo 0
-    return xCoordinates.mapIndexed { index, i -> i to yCoordinates.elementAt(index) }
+    val xCoordinates = 0..lastLetterIndex
+    return yCoordinates.mapIndexed { index, i -> i to xCoordinates.elementAt(index) }
 }
 
 fun buildUpperRightDiagonalCoordinates(letter: Char): List<Pair<Int, Int>> {
     val lastLetterIndex = ('A'..letter).count() - 1
-    val xCoordinates = (lastLetterIndex * 2) downTo lastLetterIndex
     val yCoordinates = lastLetterIndex downTo 0
-    return xCoordinates.mapIndexed { index, i -> i to yCoordinates.elementAt(index) }
+    val xCoordinates = (lastLetterIndex * 2) downTo lastLetterIndex
+    return yCoordinates.mapIndexed { index, i -> i to xCoordinates.elementAt(index) }
 }
 
 fun isSymmetricalHorizontally(diamond: Array<String>): Boolean {
