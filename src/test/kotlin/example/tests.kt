@@ -3,6 +3,7 @@ package example
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.specs.StringSpec
+import java.lang.Math.floor
 
 class MyTests : StringSpec({
     "Diamond should never be empty" {
@@ -18,6 +19,20 @@ class MyTests : StringSpec({
             lettersInUpperLeftDiagonal == (letter downTo 'A').toList()
         }
     }
+    "A diamond has decreasing letter sequence in its upper right quadrant" {
+        forAll(LetterGenerator()) { letter: Char ->
+            val diamond = buildDiamond(letter)
+            val lettersInUpperRightDiagonal = buildUpperRightDiagonalCoordinates(letter)
+                .map { diamond[it.second][it.first] }
+            lettersInUpperRightDiagonal == (letter downTo 'A').toList()
+        }
+    }
+    "A diamond should be symmetrical horizontally" {
+        forAll(LetterGenerator()) { letter: Char ->
+            val diamond = buildDiamond(letter)
+            isSymmetricalHorizontally(diamond)
+        }
+    }
 })
 
 class LetterGenerator : Gen<Char> {
@@ -29,8 +44,22 @@ class LetterGenerator : Gen<Char> {
 }
 
 fun buildUpperLeftDiagonalCoordinates(letter: Char): List<Pair<Int, Int>> {
-    val length = ('A'..letter).count() - 1
-    val xCoordinates = 0..length
-    val yCoordinates = length downTo 0
+    val lastLetterIndex = ('A'..letter).count() - 1
+    val xCoordinates = 0..lastLetterIndex
+    val yCoordinates = lastLetterIndex downTo 0
     return xCoordinates.mapIndexed { index, i -> i to yCoordinates.elementAt(index) }
+}
+
+fun buildUpperRightDiagonalCoordinates(letter: Char): List<Pair<Int, Int>> {
+    val lastLetterIndex = ('A'..letter).count() - 1
+    val xCoordinates = (lastLetterIndex * 2) downTo lastLetterIndex
+    val yCoordinates = lastLetterIndex downTo 0
+    return xCoordinates.mapIndexed { index, i -> i to yCoordinates.elementAt(index) }
+}
+
+fun isSymmetricalHorizontally(diamond: Array<String>): Boolean {
+    val half = floor(diamond.size / 2.toDouble()).toInt()
+    val top = diamond.slice(0..half)
+    val bottom = diamond.slice(half until diamond.size)
+    return top == bottom.reversed()
 }
