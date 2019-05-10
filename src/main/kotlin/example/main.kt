@@ -1,5 +1,5 @@
 package example
 
 fun main() {
-    buildDiamond('D').forEach { println(it) }
+    buildDiamond('Z').forEach { println(it) }
 }

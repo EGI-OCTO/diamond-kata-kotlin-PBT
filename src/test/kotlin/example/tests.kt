@@ -3,15 +3,14 @@ package example
 import io.kotlintest.properties.Gen
 import io.kotlintest.properties.forAll
 import io.kotlintest.specs.StringSpec
-import java.lang.Math.floor
 
-class MyTests : StringSpec({
-    "Diamond should never be empty" {
+class DiamondTests : StringSpec({
+    "Diamond is never be empty" {
         forAll(LetterGenerator()) { a: Char ->
             buildDiamond(a).isNotEmpty()
         }
     }
-    "A diamond has decreasing letter sequence in its upper left quadrant" {
+    "A diamond has a decreasing letter sequence in its upper left quadrant's diagonal" {
         forAll(LetterGenerator()) { letter: Char ->
             val diamond = buildDiamond(letter)
             val lettersInUpperLeftDiagonal = buildUpperLeftDiagonalCoordinates(letter)
@@ -19,18 +18,33 @@ class MyTests : StringSpec({
             lettersInUpperLeftDiagonal == (letter downTo 'A').toList()
         }
     }
-    "A diamond has decreasing letter sequence in its upper right quadrant" {
+    "A diamond has spaces in its upper left's quadrant non-diagonal"{
         forAll(LetterGenerator()) { letter: Char ->
             val diamond = buildDiamond(letter)
-            val lettersInUpperRightDiagonal = buildUpperRightDiagonalCoordinates(letter)
+            val lettersInUpperLeftDiagonal = buildUpperLeftNonDiagonalCoordinates(letter)
                 .map { diamond[it.first][it.second] }
-            lettersInUpperRightDiagonal == (letter downTo 'A').toList()
+            lettersInUpperLeftDiagonal.all { it == ' ' }
         }
     }
-    "A diamond should be symmetrical horizontally" {
+    "A diamond is symmetrical vertically" {
         forAll(LetterGenerator()) { letter: Char ->
             val diamond = buildDiamond(letter)
-            diamond.isSymmetricalHorizontally()
+            diamond.all { it == it.reversed() }
+        }
+    }
+    "A diamond is symmetrical horizontally" {
+        forAll(LetterGenerator()) { letter: Char ->
+            val diamond = buildDiamond(letter)
+            diamond == diamond.reversed()
+        }
+    }
+    "A diamond has width == height == 2 x letterIndex - 1 "{
+        forAll(LetterGenerator()) { letter: Char ->
+            val diamond = buildDiamond(letter)
+            val letterIndex = ('A'..letter).count()
+            diamond.size == 2 * letterIndex - 1
+                && diamond.size == diamond[0].length
+
         }
     }
 })
@@ -43,23 +57,17 @@ class LetterGenerator : Gen<Char> {
     }
 }
 
+fun buildUpperLeftNonDiagonalCoordinates(letter: Char): List<Pair<Int, Int>> {
+    val lastLetterIndex = ('A'..letter).count() - 1
+    val coordinates = 0..lastLetterIndex
+    return coordinates.zip(coordinates).minus(
+        buildUpperLeftDiagonalCoordinates(letter)
+    )
+}
+
 fun buildUpperLeftDiagonalCoordinates(letter: Char): List<Pair<Int, Int>> {
     val lastLetterIndex = ('A'..letter).count() - 1
     val yCoordinates = lastLetterIndex downTo 0
     val xCoordinates = 0..lastLetterIndex
-    return yCoordinates.mapIndexed { index, i -> i to xCoordinates.elementAt(index) }
-}
-
-fun buildUpperRightDiagonalCoordinates(letter: Char): List<Pair<Int, Int>> {
-    val lastLetterIndex = ('A'..letter).count() - 1
-    val yCoordinates = lastLetterIndex downTo 0
-    val xCoordinates = (lastLetterIndex * 2) downTo lastLetterIndex
-    return yCoordinates.mapIndexed { index, i -> i to xCoordinates.elementAt(index) }
-}
-
-fun List<String>.isSymmetricalHorizontally(): Boolean {
-    val half = floor(this.size / 2.toDouble()).toInt()
-    val top = this.slice(0..half)
-    val bottom = this.slice(half until this.size)
-    return top == bottom.reversed()
+    return yCoordinates.zip(xCoordinates)
 }
