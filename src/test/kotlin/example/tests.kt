@@ -5,7 +5,7 @@ import io.kotlintest.properties.forAll
 import io.kotlintest.specs.StringSpec
 
 class DiamondTests : StringSpec({
-    "Diamond is never be empty" {
+    "A diamond is never empty" {
         forAll(LetterGenerator()) { a: Char ->
             buildDiamond(a).isNotEmpty()
         }
