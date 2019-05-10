@@ -1,45 +1,32 @@
 package example
 
-fun buildDiamond(untilLetter: Char): Array<String> {
-    val buildLineForLetter: (Char) -> String = buildLineForLetter(untilLetter)
-    val buildDiamondFrom: (Char) -> Array<String> = buildDiamondFrom(untilLetter, buildLineForLetter)
-    return buildDiamondFrom('A')
-}
+fun buildDiamond(untilLetter: Char): List<String> {
+    val letters: CharRange = 'A'..untilLetter
+    val numberOfLetters = letters.count()
+    val maxNumberOfSpacesPerLine = ' '.replicate(numberOfLetters - 1)
+    val rightSpacesByLine: List<List<Char>> = inits(maxNumberOfSpacesPerLine)
+    val leftSpacesByLine: List<List<Char>> = rightSpacesByLine.reversed()
 
-private fun buildDiamondFrom(
-    finalLetter: Char,
-    buildLineForLetter: (Char) -> String
-): (Char) -> Array<String> {
-    return fun(letter: Char): Array<String> {
-        return if (letter == finalLetter) {
-            arrayOf(buildLineForLetter(letter))
-        } else {
-            val outerLine = buildLineForLetter(letter)
-            val innerLines = buildDiamondFrom(finalLetter, buildLineForLetter)(letter.inc())
-            arrayOf(outerLine)
-                .plus(innerLines)
-                .plus(outerLine)
+    val upperLeftQuadrant = leftSpacesByLine
+        .zip(letters) { leftSpaces: List<Char>, letter: Char ->
+            leftSpaces.plus(letter)
+        }.zip(rightSpacesByLine) { leftSpacesAndLetter: List<Char>, rightSpaces: List<Char> ->
+            leftSpacesAndLetter.plus(rightSpaces)
         }
+
+    val topHalf = upperLeftQuadrant.map {
+        it.mirror()
+    }
+
+    return topHalf.mirror().map {
+        it.joinToString("")
     }
 }
 
-private fun buildLineForLetter(
-    finalLetter: Char
-): (Char) -> String {
-    val letters = 'A'..finalLetter
-    val size = letters.count()
-    return fun(letter: Char): String {
-        val index = letters.indexOf(letter)
-        return if (letter == 'A') {
-            val spacesBefore = blankString(size - index - 1)
-            "$spacesBefore$letter"
-        } else {
-            val spacesBefore = blankString(size - index - 1)
-            val spacesInBetween = blankString((index * 2) - 1)
-            "$spacesBefore$letter$spacesInBetween$letter"
-        }
-    }
-}
+private fun <T> List<T>.mirror() = this.plus(this.reversed().drop(1))
 
-private fun blankString(length: Int) =
-    CharArray(length) { ' ' }.joinToString("")
+private infix fun <T> T.replicate(length: Int) = List(length) { this }
+
+private inline fun <reified T> inits(list: List<T>) = (0..list.size).map {
+    list.take(it)
+}

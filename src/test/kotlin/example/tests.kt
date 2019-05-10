@@ -30,7 +30,7 @@ class MyTests : StringSpec({
     "A diamond should be symmetrical horizontally" {
         forAll(LetterGenerator()) { letter: Char ->
             val diamond = buildDiamond(letter)
-            isSymmetricalHorizontally(diamond)
+            diamond.isSymmetricalHorizontally()
         }
     }
 })
@@ -57,9 +57,9 @@ fun buildUpperRightDiagonalCoordinates(letter: Char): List<Pair<Int, Int>> {
     return yCoordinates.mapIndexed { index, i -> i to xCoordinates.elementAt(index) }
 }
 
-fun isSymmetricalHorizontally(diamond: Array<String>): Boolean {
-    val half = floor(diamond.size / 2.toDouble()).toInt()
-    val top = diamond.slice(0..half)
-    val bottom = diamond.slice(half until diamond.size)
+fun List<String>.isSymmetricalHorizontally(): Boolean {
+    val half = floor(this.size / 2.toDouble()).toInt()
+    val top = this.slice(0..half)
+    val bottom = this.slice(half until this.size)
     return top == bottom.reversed()
 }
